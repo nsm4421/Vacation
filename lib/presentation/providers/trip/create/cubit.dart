@@ -5,6 +5,8 @@ import 'package:injectable/injectable.dart';
 import 'package:vacation/domain/usecases/export.dart';
 import 'package:vacation/shared/export.dart';
 
+import '../../abs/abs_state.dart';
+
 part 'cubit.g.dart';
 
 part 'state.dart';

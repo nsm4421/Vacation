@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vacation/presentation/providers/export.dart';
+import 'package:vacation/shared/export.dart';
 
 class CreateTripFormFragment extends StatefulWidget {
   const CreateTripFormFragment({super.key});
@@ -9,7 +10,7 @@ class CreateTripFormFragment extends StatefulWidget {
   State<CreateTripFormFragment> createState() => _CreateTripFormFragmentState();
 }
 
-class _CreateTripFormFragmentState extends State<CreateTripFormFragment> {
+class _CreateTripFormFragmentState extends State<CreateTripFormFragment> with DateFormatterMixIn {
   late TextEditingController _tripNameController;
   late TextEditingController _dateRangeController;
   late FocusNode _tripNameFocus;
@@ -24,7 +25,7 @@ class _CreateTripFormFragmentState extends State<CreateTripFormFragment> {
     _tripNameFocus = FocusNode()..addListener(_handleTripNameFocus);
     _dateRangeController =
         TextEditingController()
-          ..text = _handleFormatDateRange(
+          ..text = handleFormatDateRange(
             context.read<CreateTripCubit>().state.data.dateRange,
           );
     _dateRangeFocus = FocusNode()..addListener(_handleDateRangeFocus);
@@ -65,19 +66,12 @@ class _CreateTripFormFragmentState extends State<CreateTripFormFragment> {
       initialDateRange: context.read<CreateTripCubit>().state.data.dateRange,
     ).then((selected) {
       if (selected == null || !context.mounted) return;
-      _dateRangeController.text = _handleFormatDateRange(selected);
+      _dateRangeController.text = handleFormatDateRange(selected);
       context.read<CreateTripCubit>().updateData(dateRange: selected);
       FocusScope.of(context).unfocus();
     });
   }
 
-  String _handleFormatDateRange(DateTimeRange range) {
-    return '${_handleFormatDateTime(range.start)} ~ ${_handleFormatDateTime(range.end)}';
-  }
-
-  String _handleFormatDateTime(DateTime dt) {
-    return "${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}";
-  }
 
   @override
   Widget build(BuildContext context) {

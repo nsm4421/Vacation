@@ -1,4 +1,4 @@
-enum Status { initial, loading, error, success }
+import 'package:vacation/shared/export.dart';
 
 abstract class AbsBlocState<T> {
   final Status status;

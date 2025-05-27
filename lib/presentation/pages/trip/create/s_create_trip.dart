@@ -23,15 +23,19 @@ class CreateTripScreen extends StatelessWidget {
           switch (state.status) {
             case Status.success:
               // TODO : show success message
-              context.pop();
+              if (context.mounted) {
+                context.pop();
+              }
               return;
             case Status.error:
               // TODO : show error message
               Timer(Duration(seconds: 1), () {
-                context.read<CreateTripCubit>().updateStatus(
-                  status: Status.initial,
-                  message: '',
-                );
+                if (context.mounted) {
+                  context.read<CreateTripCubit>().updateStatus(
+                    status: Status.initial,
+                    message: '',
+                  );
+                }
               });
               return;
             default:
