@@ -2,12 +2,13 @@ import 'package:either_dart/either.dart';
 import 'package:vacation/domain/repositories/export.dart';
 import 'package:vacation/shared/export.dart';
 
-class CreateTripUseCase {
+class EditTripUseCase {
   final TripRepository _repository;
 
-  CreateTripUseCase(this._repository);
+  EditTripUseCase(this._repository);
 
   Future<Result<void>> call({
+    required int id,
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
@@ -18,7 +19,8 @@ class CreateTripUseCase {
         startDate: startDate,
         endDate: endDate,
       ),
-      () => _insertData(
+      () => _updateData(
+        id: id,
         tripName: tripName,
         startDate: startDate,
         endDate: endDate,
@@ -46,19 +48,21 @@ class CreateTripUseCase {
     return Right(null);
   }
 
-  Future<Result<void>> _insertData({
+  Future<Result<void>> _updateData({
+    required int id,
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
   }) async {
     try {
-      await _repository.createTrip(
+      await _repository.updateTrip(
+        id: id,
         tripName: tripName,
         startDate: startDate,
         endDate: endDate,
       );
     } catch (error) {
-      return Left(Failure(message: 'inserting data in db fails'));
+      return Left(Failure(message: 'modifying trip fails'));
     }
     return Right(null);
   }

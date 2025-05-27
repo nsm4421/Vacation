@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:vacation/data/models/export.dart';
 
 import '../schema/dao/history.dart';
 import '../schema/dao/trip.dart';
@@ -17,17 +18,48 @@ class LocalTripDataSourceImpl implements LocalTripDataSource {
        _historyDao = historyDao;
 
   @override
-  Future<int> insertTripAndReturnId({
+  Future<int> insertTrip({
     required String tripName,
-    DateTime? startDate,
-    DateTime? endDate,
+    required DateTime startDate,
+    required DateTime endDate,
   }) async {
     return await _tripDao.insertTrip(
-      TripTableCompanion(
-        tripName: Value(tripName),
-        startDate: Value(startDate ?? DateTime.now()),
-        endDate: Value(endDate ?? DateTime(9999, 12, 31)),
+      tripName: tripName,
+      startDate: startDate,
+      endDate: endDate,
+    );
+  }
+
+  @override
+  Future<Iterable<FetchTripModel>> fetchAllTrips() async {
+    return await _tripDao.getAllTrips().then(
+      (res) => res.map(
+        (e) => FetchTripModel(
+          id: e.id,
+          tripName: e.tripName,
+          startDate: e.startDate,
+          endDate: e.endDate,
+        ),
       ),
     );
+  }
+
+  @override
+  Future<bool> updateTrip({
+    required int id,
+    required String tripName,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    final trip = await _tripDao.getTripById(id);
+    if (trip == null) throw Exception('trip entity not found with id $id');
+    return await _tripDao.updateTrip(
+      trip.copyWith(tripName: tripName, startDate: startDate, endDate: endDate),
+    );
+  }
+
+  @override
+  Future<int> deleteTripById(int id) async {
+    return await _tripDao.deleteTrip(id);
   }
 }

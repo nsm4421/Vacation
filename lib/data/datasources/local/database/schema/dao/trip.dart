@@ -9,8 +9,17 @@ class TripDao extends DatabaseAccessor<LocalDatabase> with _$TripDaoMixin {
   TripDao(super.db);
 
   // Create
-  Future<int> insertTrip(TripTableCompanion trip) =>
-      into(tripTable).insert(trip);
+  Future<int> insertTrip({
+    required String tripName,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) => into(tripTable).insert(
+    TripTableCompanion(
+      tripName: Value(tripName),
+      startDate: Value(startDate),
+      endDate: Value(endDate),
+    ),
+  );
 
   // Read
   Future<List<TripTableData>> getAllTrips() => select(tripTable).get();

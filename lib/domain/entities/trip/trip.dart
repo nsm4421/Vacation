@@ -1,4 +1,5 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:vacation/data/models/export.dart';
 
 import '../base_entity.dart';
 
@@ -21,5 +22,14 @@ class TripEntity extends BaseEntity {
     List<HistoryEntity>? histories,
   }) {
     this.histories = histories ?? [];
+  }
+
+  factory TripEntity.from(FetchTripModel model) {
+    return TripEntity(
+      id: model.id,
+      tripName: model.tripName,
+      startDate: model.startDate,
+      endDate: model.endDate,
+    );
   }
 }
