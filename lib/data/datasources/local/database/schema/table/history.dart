@@ -10,7 +10,11 @@ class HistoryTable extends Table {
 
   TextColumn get placeName => text()();
 
-  TextColumn get description => text().nullable()();
+  TextColumn get description => text()();
 
   DateTimeColumn get visitedAt => dateTime()();
+
+  RealColumn get latitude => real().nullable()();
+
+  RealColumn get longitude => real().nullable()();
 }

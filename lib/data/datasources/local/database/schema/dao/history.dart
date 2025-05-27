@@ -10,8 +10,23 @@ class HistoryDao extends DatabaseAccessor<LocalDatabase>
   HistoryDao(super.db);
 
   // CREATE
-  Future<int> insertHistory(HistoryTableCompanion history) =>
-      into(historyTable).insert(history);
+  Future<int> insertHistory({
+    required int tripId,
+    required String placeName,
+    required String description,
+    required DateTime visitedAt,
+    double? latitude,
+    double? longitude,
+  }) => into(historyTable).insert(
+    HistoryTableCompanion(
+      tripId: Value(tripId),
+      placeName: Value(placeName),
+      description: Value(description),
+      visitedAt: Value(visitedAt),
+      latitude: Value(latitude),
+      longitude: Value(longitude),
+    ),
+  );
 
   // READ
   Future<List<HistoryTableData>> getAllHistories() =>

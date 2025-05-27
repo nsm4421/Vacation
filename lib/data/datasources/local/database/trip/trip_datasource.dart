@@ -1,4 +1,4 @@
-part of 'datasource_impl.dart';
+part of 'trip_datasource_impl.dart';
 
 abstract interface class LocalTripDataSource {
   Future<int> insertTrip({
