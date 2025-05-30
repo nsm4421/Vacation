@@ -5,7 +5,9 @@ enum RoutePaths {
   signUp('/auth/sign-up', isAuth: true),
   entry('/'),
   displayTrips('/trip'),
-  createTrips('/trip/create');
+  createTrip('/trip/create'),
+  editTrip('/trip/edit'),
+  tripDetail('/trip/detail');
 
   final String path;
   final bool isAuth;

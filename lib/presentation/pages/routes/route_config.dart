@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vacation/domain/entities/export.dart';
 import 'package:vacation/presentation/pages/export.dart';
-
-import '../trip/create/s_create_trip.dart';
+import 'package:vacation/presentation/pages/trip/detail/s_trip_detail.dart';
+import 'package:vacation/presentation/pages/trip/edit/s_edit_trip.dart';
+import 'package:vacation/shared/export.dart';
 
 part 'route_paths.dart';
 
 @lazySingleton
-class CustomRouter {
+class CustomRouter with LoggerMixIn {
   late final GlobalKey<NavigatorState> _rootNavigatorKey;
 
   CustomRouter() {
@@ -33,11 +35,35 @@ class CustomRouter {
   Iterable<GoRoute> get _tripRoutes => [
     GoRoute(
       path: RoutePaths.displayTrips.path,
-      builder: (_, __) => const Text('NOT FOUND'),
+      builder: (_, __) => const DisplayTripScreen(),
     ),
     GoRoute(
-      path: RoutePaths.createTrips.path,
+      path: RoutePaths.createTrip.path,
       builder: (_, __) => const CreateTripScreen(),
+    ),
+    GoRoute(
+      path: RoutePaths.tripDetail.path,
+      builder: (_, state) {
+        try {
+          final e = state.extra as TripEntity;
+          return TripDetailScreen(e);
+        } catch (error) {
+          logger.e(error);
+          return Text('PAGE NOT FOUND');
+        }
+      },
+    ),
+    GoRoute(
+      path: RoutePaths.editTrip.path,
+      builder: (_, state) {
+        try {
+          final e = state.extra as TripEntity;
+          return EditTripScreen(e);
+        } catch (error) {
+          logger.e(error);
+          return Text('PAGE NOT FOUND');
+        }
+      },
     ),
   ];
 }

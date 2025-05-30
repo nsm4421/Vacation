@@ -7,11 +7,11 @@ import 'package:vacation/shared/export.dart';
 
 import '../../abs/abs_state.dart';
 
-part 'event.dart';
+part 'display_trips_event.dart';
 
-part 'state.dart';
+part 'display_trips_state.dart';
 
-part 'bloc.g.dart';
+part 'display_trips_bloc.g.dart';
 
 @injectable
 class DisplayTripsBloc extends Bloc<DisplayTripsEvent, DisplayTripsState>

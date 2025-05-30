@@ -1,4 +1,4 @@
-part of 'cubit.dart';
+part of 'create_trip_cubit.dart';
 
 @CopyWith()
 class CreateTripData {
