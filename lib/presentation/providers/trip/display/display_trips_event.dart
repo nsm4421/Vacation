@@ -1,6 +1,6 @@
-part of 'bloc.dart';
+part of 'display_trips_bloc.dart';
 
-sealed class DisplayTripsEvent {}
+abstract class DisplayTripsEvent {}
 
 class DisplayTripsMountedEvent extends DisplayTripsEvent {}
 

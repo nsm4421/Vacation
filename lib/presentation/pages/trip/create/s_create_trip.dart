@@ -8,7 +8,7 @@ import 'package:vacation/presentation/providers/export.dart';
 import 'package:vacation/presentation/widgets/export.dart';
 import 'package:vacation/shared/export.dart';
 
-import 'f_form.dart';
+import 'f_trip_form.dart';
 import 'w_submit_button.dart';
 
 class CreateTripScreen extends StatelessWidget {
@@ -48,7 +48,13 @@ class CreateTripScreen extends StatelessWidget {
               showOverlay: state.status != Status.initial,
               child: Scaffold(
                 appBar: AppBar(title: Text("Create Trip")),
-                body: CreateTripFormFragment(),
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: TripFormFragment(),
+                ),
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.endFloat,
                 floatingActionButton: SubmitCreateTripFormButton(),

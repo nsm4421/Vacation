@@ -14,7 +14,13 @@ class IndexScreen extends StatelessWidget {
           Text("TEST"),
           ElevatedButton(
             onPressed: (){
-              context.push(RoutePaths.createTrips.path);
+              context.push(RoutePaths.displayTrips.path);
+            },
+            child: Text("Display Trips"),
+          ),
+          ElevatedButton(
+            onPressed: (){
+              context.push(RoutePaths.createTrip.path);
             },
             child: Text("Create Trip"),
           ),

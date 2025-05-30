@@ -7,9 +7,9 @@ import 'package:vacation/shared/export.dart';
 
 import '../../abs/abs_state.dart';
 
-part 'cubit.g.dart';
+part 'create_trip_cubit.g.dart';
 
-part 'state.dart';
+part 'create_trip_state.dart';
 
 @injectable
 class CreateTripCubit extends Cubit<CreateTripState> with LoggerMixIn {

@@ -21,6 +21,7 @@ class HistoryEntity extends BaseEntity {
     return HistoryEntity(
       id: model.id,
       placeName: model.placeName,
+      description: model.description,
       visitedAt: model.visitedAt,
       latitude: model.latitude,
       longitude: model.longitude,
