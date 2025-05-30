@@ -7,11 +7,12 @@ part 'trip.g.dart';
 
 part 'history.dart';
 
-@CopyWith()
+@CopyWith(copyWithNull: true)
 class TripEntity extends BaseEntity {
   final String tripName;
   final DateTime startDate;
   final DateTime endDate;
+  final String? thumbnail;
   late final List<HistoryEntity> histories;
 
   TripEntity({
@@ -19,17 +20,23 @@ class TripEntity extends BaseEntity {
     required this.tripName,
     required this.startDate,
     required this.endDate,
+    this.thumbnail,
     List<HistoryEntity>? histories,
   }) {
     this.histories = histories ?? [];
   }
 
-  factory TripEntity.from(FetchTripModel model) {
+  factory TripEntity.from(
+    FetchTripModel model, {
+    List<HistoryEntity>? histories,
+  }) {
     return TripEntity(
       id: model.id,
       tripName: model.tripName,
+      thumbnail: model.thumbnail,
       startDate: model.startDate,
       endDate: model.endDate,
+      histories: histories ?? [],
     );
   }
 }

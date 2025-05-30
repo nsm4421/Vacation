@@ -12,12 +12,14 @@ class FetchTripModel with _$FetchTripModel {
     required this.tripName,
     required this.startDate,
     required this.endDate,
+    this.thumbnail
   });
 
   final int id;
   final String tripName;
   final DateTime startDate;
   final DateTime endDate;
+  final String? thumbnail;
 
   factory FetchTripModel.fromJson(Map<String, dynamic> json) =>
       _$FetchTripModelFromJson(json);

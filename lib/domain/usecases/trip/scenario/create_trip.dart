@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:either_dart/either.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:vacation/domain/repositories/export.dart';
 import 'package:vacation/shared/export.dart';
 
 class CreateTripUseCase {
   final TripRepository _repository;
+  String? _thumbnail;
 
   CreateTripUseCase(this._repository);
 
@@ -11,17 +15,21 @@ class CreateTripUseCase {
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    XFile? thumbnailFile,
   }) async {
+    _thumbnail = null;
     final tasks = <Future<Result<void>> Function()>[
       () => _validation(
         tripName: tripName,
         startDate: startDate,
         endDate: endDate,
       ),
+      () => _handleImage(thumbnailFile),
       () => _insertData(
         tripName: tripName,
         startDate: startDate,
         endDate: endDate,
+        thumbnail: _thumbnail,
       ),
     ];
 
@@ -46,16 +54,30 @@ class CreateTripUseCase {
     return Right(null);
   }
 
+  Future<Result<void>> _handleImage(XFile? thumbnailFile) async {
+    try {
+      if (thumbnailFile != null) {
+        final file = File(thumbnailFile!.path);
+        _thumbnail = await _repository.saveThumbnail(file);
+      }
+    } catch (error) {
+      return Left(Failure(message: 'saving image fails'));
+    }
+    return Right(null);
+  }
+
   Future<Result<void>> _insertData({
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    String? thumbnail,
   }) async {
     try {
       await _repository.createTrip(
         tripName: tripName,
         startDate: startDate,
         endDate: endDate,
+        thumbnail: thumbnail,
       );
     } catch (error) {
       return Left(Failure(message: 'inserting data in db fails'));

@@ -14,11 +14,13 @@ class LocalTripDataSourceImpl implements LocalTripDataSource {
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    String? thumbnail,
   }) async {
     return await _tripDao.insertTrip(
       tripName: tripName,
       startDate: startDate,
       endDate: endDate,
+      thumbnail: thumbnail,
     );
   }
 
@@ -42,11 +44,16 @@ class LocalTripDataSourceImpl implements LocalTripDataSource {
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    String? thumbnail,
   }) async {
     final trip = await _tripDao.getTripById(id);
     if (trip == null) throw Exception('trip not found with id $id');
     return await _tripDao.updateTrip(
-      trip.copyWith(tripName: tripName, startDate: startDate, endDate: endDate),
+      id: id,
+      tripName: tripName,
+      startDate: startDate,
+      endDate: endDate,
+      thumbnail: thumbnail,
     );
   }
 

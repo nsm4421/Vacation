@@ -5,6 +5,7 @@ abstract interface class LocalTripDataSource {
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    String? thumbnail
   });
 
   Future<Iterable<FetchTripModel>> fetchAllTrips();
@@ -14,6 +15,7 @@ abstract interface class LocalTripDataSource {
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    String? thumbnail
   });
 
   Future<int> deleteTripById(int id);

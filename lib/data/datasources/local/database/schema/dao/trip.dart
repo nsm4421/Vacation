@@ -13,11 +13,13 @@ class TripDao extends DatabaseAccessor<LocalDatabase> with _$TripDaoMixin {
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    String? thumbnail,
   }) => into(tripTable).insert(
     TripTableCompanion(
       tripName: Value(tripName),
       startDate: Value(startDate),
       endDate: Value(endDate),
+      thumbnail: Value(thumbnail),
     ),
   );
 
@@ -28,8 +30,21 @@ class TripDao extends DatabaseAccessor<LocalDatabase> with _$TripDaoMixin {
       (select(tripTable)..where((t) => t.id.equals(id))).getSingleOrNull();
 
   // Update
-  Future<bool> updateTrip(TripTableData trip) =>
-      update(tripTable).replace(trip);
+  Future<bool> updateTrip({
+    required int id,
+    required String tripName,
+    required DateTime startDate,
+    required DateTime endDate,
+    String? thumbnail,
+  }) => update(tripTable).replace(
+    TripTableCompanion(
+      id: Value(id),
+      tripName: Value(tripName),
+      startDate: Value(startDate),
+      endDate: Value(endDate),
+      thumbnail: Value(thumbnail),
+    ),
+  );
 
   // Delete
   Future<int> deleteTrip(int id) =>

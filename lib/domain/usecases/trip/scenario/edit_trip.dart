@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:either_dart/either.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:vacation/domain/repositories/export.dart';
 import 'package:vacation/shared/export.dart';
 
 class EditTripUseCase {
   final TripRepository _repository;
+  String? _thumbnail;
 
   EditTripUseCase(this._repository);
 
@@ -12,18 +16,26 @@ class EditTripUseCase {
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    XFile? thumbnailFile,
+    String? originalThumbnail,
   }) async {
+    _thumbnail = null;
     final tasks = <Future<Result<void>> Function()>[
       () => _validation(
         tripName: tripName,
         startDate: startDate,
         endDate: endDate,
       ),
+      () => _handleThumbnail(
+        thumbnailFile: thumbnailFile,
+        originalThumbnail: originalThumbnail,
+      ),
       () => _updateData(
         id: id,
         tripName: tripName,
         startDate: startDate,
         endDate: endDate,
+        thumbnail: _thumbnail,
       ),
     ];
 
@@ -48,11 +60,33 @@ class EditTripUseCase {
     return Right(null);
   }
 
+  Future<Result<void>> _handleThumbnail({
+    String? originalThumbnail,
+    XFile? thumbnailFile,
+  }) async {
+    try {
+      if (originalThumbnail == null && thumbnailFile != null) {
+        _thumbnail = await _repository.saveThumbnail(File(thumbnailFile.path));
+      } else if (originalThumbnail != null && thumbnailFile == null) {
+        await _repository.deleteThumbnail(originalThumbnail);
+      } else if (originalThumbnail != null && thumbnailFile != null) {
+        _thumbnail = await _repository.changeThumbnail(
+          file: File(thumbnailFile.path),
+          originalPath: originalThumbnail,
+        );
+      }
+      return Right(null);
+    } catch (error) {
+      return Left(Failure(message: 'modifying trip fails'));
+    }
+  }
+
   Future<Result<void>> _updateData({
     required int id,
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    String? thumbnail,
   }) async {
     try {
       await _repository.updateTrip(
@@ -60,6 +94,7 @@ class EditTripUseCase {
         tripName: tripName,
         startDate: startDate,
         endDate: endDate,
+        thumbnail: thumbnail,
       );
     } catch (error) {
       return Left(Failure(message: 'modifying trip fails'));

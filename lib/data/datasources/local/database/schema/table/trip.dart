@@ -5,6 +5,8 @@ class TripTable extends Table {
 
   TextColumn get tripName => text()();
 
+  TextColumn get thumbnail => text().nullable()();
+
   DateTimeColumn get startDate =>
       dateTime().withDefault(Constant(DateTime.now()))();
 
