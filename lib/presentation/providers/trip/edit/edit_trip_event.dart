@@ -14,8 +14,9 @@ class UpdateStateEvent extends EditTripEvent {
 class UpdateTripDataEvent extends EditTripEvent {
   final String? tripName;
   final DateTimeRange? dateRange;
+  final XFile? thumbnail;
 
-  UpdateTripDataEvent({this.tripName, this.dateRange});
+  UpdateTripDataEvent({this.tripName, this.dateRange, this.thumbnail});
 }
 
 class UpdateHistoryDataEvent extends EditTripEvent {

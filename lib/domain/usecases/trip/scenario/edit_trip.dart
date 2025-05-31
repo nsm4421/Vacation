@@ -2,16 +2,18 @@ import 'dart:io';
 
 import 'package:either_dart/either.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'package:vacation/domain/repositories/export.dart';
 import 'package:vacation/shared/export.dart';
 
 class EditTripUseCase {
   final TripRepository _repository;
+  final Logger? _logger;
   String? _thumbnail;
 
-  EditTripUseCase(this._repository);
+  EditTripUseCase(this._repository, {Logger? logger}) : _logger = logger;
 
-  Future<Result<void>> call({
+  Future<Result<String?>> call({
     required int id,
     required String tripName,
     required DateTime startDate,
@@ -20,7 +22,7 @@ class EditTripUseCase {
     String? originalThumbnail,
   }) async {
     _thumbnail = null;
-    final tasks = <Future<Result<void>> Function()>[
+    final tasks = <Future<Result<String?>> Function()>[
       () => _validation(
         tripName: tripName,
         startDate: startDate,
@@ -44,10 +46,10 @@ class EditTripUseCase {
       if (result.isLeft) return result;
     }
 
-    return Right(null);
+    return Right(_thumbnail);
   }
 
-  Future<Result<void>> _validation({
+  Future<Result<String?>> _validation({
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
@@ -60,20 +62,28 @@ class EditTripUseCase {
     return Right(null);
   }
 
-  Future<Result<void>> _handleThumbnail({
+  Future<Result<String?>> _handleThumbnail({
     String? originalThumbnail,
     XFile? thumbnailFile,
   }) async {
     try {
-      if (originalThumbnail == null && thumbnailFile != null) {
+      if (originalThumbnail == null && thumbnailFile == null) {
+        _logger?.t('thumbnail not changed');
+        _thumbnail = null;
+      } else if (originalThumbnail == null && thumbnailFile != null) {
+        _logger?.t('thumbnail added');
         _thumbnail = await _repository.saveThumbnail(File(thumbnailFile.path));
       } else if (originalThumbnail != null && thumbnailFile == null) {
+        _logger?.t('thumbnail deleted');
         await _repository.deleteThumbnail(originalThumbnail);
       } else if (originalThumbnail != null && thumbnailFile != null) {
+        _logger?.t('thumbnail replaced');
         _thumbnail = await _repository.changeThumbnail(
           file: File(thumbnailFile.path),
           originalPath: originalThumbnail,
         );
+      } else {
+        throw Exception('impossible case');
       }
       return Right(null);
     } catch (error) {
@@ -81,7 +91,7 @@ class EditTripUseCase {
     }
   }
 
-  Future<Result<void>> _updateData({
+  Future<Result<String?>> _updateData({
     required int id,
     required String tripName,
     required DateTime startDate,

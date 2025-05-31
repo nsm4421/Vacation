@@ -1,6 +1,7 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:vacation/domain/entities/export.dart';
@@ -66,6 +67,7 @@ class EditTripBloc extends Bloc<EditTripEvent, EditTripState> with LoggerMixIn {
             tripName: temp.tripName,
             startDate: temp.startDate,
             endDate: temp.endDate,
+            thumbnailFile: event.thumbnail,
           )
           .then(
             (res) => res.fold(
@@ -81,7 +83,9 @@ class EditTripBloc extends Bloc<EditTripEvent, EditTripState> with LoggerMixIn {
                 emit(
                   state.copyWith(
                     status: Status.success,
-                    data: state.data.copyWith(trip: temp),
+                    data: state.data.copyWith(
+                      trip: temp.copyWith(thumbnail: r),  // 썸네일 파일 경로 업데이트
+                    ),
                   ),
                 );
               },

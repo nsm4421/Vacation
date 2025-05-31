@@ -1,3 +1,4 @@
+import 'package:logger/logger.dart';
 import 'package:vacation/data/models/export.dart';
 
 import '../schema/dao/trip.dart';
@@ -6,8 +7,9 @@ part 'trip_datasource.dart';
 
 class LocalTripDataSourceImpl implements LocalTripDataSource {
   final TripDao _tripDao;
+  final Logger? _logger;
 
-  LocalTripDataSourceImpl(this._tripDao);
+  LocalTripDataSourceImpl(this._tripDao, {Logger? logger}) : _logger = logger;
 
   @override
   Future<int> insertTrip({
@@ -16,6 +18,9 @@ class LocalTripDataSourceImpl implements LocalTripDataSource {
     required DateTime endDate,
     String? thumbnail,
   }) async {
+    _logger?.d(
+      'tripName:$tripName|thumbnail:$thumbnail|date:$startDate~$endDate',
+    );
     return await _tripDao.insertTrip(
       tripName: tripName,
       startDate: startDate,
@@ -33,6 +38,7 @@ class LocalTripDataSourceImpl implements LocalTripDataSource {
           tripName: e.tripName,
           startDate: e.startDate,
           endDate: e.endDate,
+          thumbnail: e.thumbnail
         ),
       ),
     );

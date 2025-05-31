@@ -1,4 +1,5 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:vacation/data/models/export.dart';
 
 import '../base_entity.dart';
@@ -25,6 +26,8 @@ class TripEntity extends BaseEntity {
   }) {
     this.histories = histories ?? [];
   }
+
+  DateTimeRange get dateRange => DateTimeRange(start: startDate, end: endDate);
 
   factory TripEntity.from(
     FetchTripModel model, {

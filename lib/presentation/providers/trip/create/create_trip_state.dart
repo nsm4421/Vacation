@@ -1,11 +1,12 @@
 part of 'create_trip_cubit.dart';
 
-@CopyWith()
+@CopyWith(copyWithNull: true)
 class CreateTripData {
   final String tripName;
   final DateTimeRange dateRange;
+  final XFile? thumbnail;
 
-  CreateTripData({this.tripName = '', required this.dateRange});
+  CreateTripData({this.tripName = '', required this.dateRange, this.thumbnail});
 }
 
 @CopyWith()

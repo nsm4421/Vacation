@@ -1,3 +1,4 @@
+import 'package:logger/logger.dart';
 import 'package:vacation/data/models/export.dart';
 
 import '../schema/dao/history.dart';
@@ -6,8 +7,10 @@ part 'history_datasource.dart';
 
 class LocalHistoryDataSourceImpl implements LocalHistoryDataSource {
   final HistoryDao _historyDao;
+  final Logger? _logger;
 
-  LocalHistoryDataSourceImpl(this._historyDao);
+  LocalHistoryDataSourceImpl(this._historyDao, {Logger? logger})
+    : _logger = logger;
 
   @override
   Future<int> insertHistory({
@@ -18,6 +21,9 @@ class LocalHistoryDataSourceImpl implements LocalHistoryDataSource {
     double? latitude,
     double? longitude,
   }) async {
+    _logger?.d(
+      'tripId:$tripId|placeName:$placeName|visitedAt:$visitedAt|latitude:$latitude|longitude:$longitude',
+    );
     return await _historyDao.insertHistory(
       tripId: tripId,
       placeName: placeName,
