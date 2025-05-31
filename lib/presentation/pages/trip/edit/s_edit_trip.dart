@@ -8,7 +8,7 @@ import 'package:vacation/presentation/providers/export.dart';
 import 'package:vacation/presentation/widgets/export.dart';
 import 'package:vacation/shared/export.dart';
 
-import 'f_edit_trip_modal.dart';
+import 'f_trip_info.dart';
 import 'f_histories.dart';
 
 class EditTripScreen extends StatelessWidget {
@@ -27,7 +27,9 @@ class EditTripScreen extends StatelessWidget {
                 (curr.status == Status.success) ||
                 (curr.status == Status.error),
         listener: (context, state) {
-          // TODO : 오류인 경우 snackbar 띄우기
+          if (state.status == Status.error) {
+            context.showErrorSnackBar(state.message);
+          }
           Timer(Duration(seconds: 1), () {
             if (context.mounted) {
               context.read<EditTripBloc>().add(
@@ -41,7 +43,14 @@ class EditTripScreen extends StatelessWidget {
             return LoadingOverlayWidget(
               showOverlay: state.status == Status.loading,
               child: Scaffold(
-                appBar: AppBar(title: Text('Edit Trip')),
+                appBar: AppBar(
+                  title: Text('Edit Trip'),
+                  actions: [
+                    CircularAvatarImageWidget(
+                      imagePath: state.data.trip.thumbnail,
+                    ),
+                  ],
+                ),
                 body: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -50,29 +59,7 @@ class EditTripScreen extends StatelessWidget {
                         horizontal: 16,
                         vertical: 12,
                       ),
-                      child: TripInfoWidget(
-                        state.data.trip,
-                        onClickEditButton: () async {
-                          await showModalBottomSheet(
-                            showDragHandle: true,
-                            isDismissible: true,
-                            context: context,
-                            builder: (_) {
-                              return EditTripModalFragment(
-                                trip: state.data.trip,
-                                handleCompleteEdit: (tripName, dateRange) {
-                                  context.read<EditTripBloc>().add(
-                                    UpdateTripDataEvent(
-                                      tripName: tripName,
-                                      dateRange: dateRange,
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        },
-                      ),
+                      child: TripInfoFragment(state.data.trip),
                     ),
                     Divider(),
                     Padding(

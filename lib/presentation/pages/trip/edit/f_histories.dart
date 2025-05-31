@@ -1,10 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vacation/domain/entities/export.dart';
 import 'package:vacation/presentation/providers/export.dart';
 import 'package:vacation/shared/export.dart';
 
-import 'f_edit_history_modal.dart';
+import 'history_modal/s_edit_history_modal.dart';
 
 enum PopUpMenuEnums {
   edit(label: 'EDIT', iconData: Icons.edit_outlined),
@@ -27,33 +30,79 @@ class HistoriesFragment extends StatefulWidget {
 
 class _HistoriesFragmentState extends State<HistoriesFragment>
     with DateFormatterMixIn {
+  late Stream<bool> _stream;
+
+  @override
+  initState() {
+    super.initState();
+    _stream =
+        context
+            .read<EditTripBloc>()
+            .stream
+            .map((e) => e.status == Status.success)
+            .distinct();
+  }
+
+  _handleInsertHistory({
+    required String placeName,
+    required String description,
+    required DateTime visitedAt,
+    double? latitude,
+    double? longitude,
+  }) {
+    context.read<EditTripBloc>().add(
+      InsertHistoryDataEvent(
+        placeName: placeName,
+        description: description,
+        visitedAt: visitedAt,
+        latitude: latitude,
+        longitude: longitude,
+      ),
+    );
+  }
+
   _handleShowCreateHistoryModal() async {
     await showModalBottomSheet(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
       builder:
-          (_) => EditHistoryModalFragment(
-            handleSubmit: ({
-              required String placeName,
-              required String description,
-              required DateTime visitedAt,
-              double? latitude,
-              double? longitude,
-            }) {
-              context.read<EditTripBloc>().add(
-                InsertHistoryDataEvent(
-                  placeName: placeName,
-                  description: description,
-                  visitedAt: visitedAt,
-                  latitude: latitude,
-                  longitude: longitude,
-                ),
+          (childContext) => StreamBuilder<bool>(
+            stream: _stream,
+            builder: (_, snapshot) {
+              if (snapshot.data == true && childContext.mounted) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (childContext.canPop()) {
+                    childContext.pop();
+                  }
+                });
+              }
+              return EditHistoryModalScreen(
+                handleSubmit: _handleInsertHistory,
+                dateRange:
+                    context.read<EditTripBloc>().state.data.trip.dateRange,
               );
             },
           ),
     );
   }
+
+  _handleUpdateHistory(HistoryEntity e) => ({
+    required String placeName,
+    required String description,
+    required DateTime visitedAt,
+    double? latitude,
+    double? longitude,
+  }) {
+    context.read<EditTripBloc>().add(
+      UpdateHistoryDataEvent(
+        historyId: e.id,
+        placeName: placeName,
+        description: description,
+        visitedAt: visitedAt,
+      ),
+    );
+  };
 
   _handleShowEditHistoryModal(HistoryEntity e) => () async {
     await showModalBottomSheet(
@@ -61,22 +110,15 @@ class _HistoriesFragmentState extends State<HistoriesFragment>
       showDragHandle: true,
       isScrollControlled: true,
       builder:
-          (_) => EditHistoryModalFragment(
-            initialHistory: e,
-            handleSubmit: ({
-              required String placeName,
-              required String description,
-              required DateTime visitedAt,
-              double? latitude,
-              double? longitude,
-            }) {
-              context.read<EditTripBloc>().add(
-                UpdateHistoryDataEvent(
-                  historyId: e.id,
-                  placeName: placeName,
-                  description: description,
-                  visitedAt: visitedAt,
-                ),
+          (childContext) => StreamBuilder<bool>(
+            stream: _stream,
+            builder: (_, snapshot) {
+              if (snapshot.data == true) childContext.pop();
+              return EditHistoryModalScreen(
+                initialHistory: e,
+                handleSubmit: _handleUpdateHistory(e),
+                dateRange:
+                    context.read<EditTripBloc>().state.data.trip.dateRange,
               );
             },
           ),

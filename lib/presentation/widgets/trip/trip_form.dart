@@ -63,7 +63,7 @@ class _TripFormWidgetState extends State<TripFormWidget>
   }
 
   _handlePickDateRange() async {
-    FocusScope.of(context).unfocus();
+    context.unfocus();
     await showDateRangePicker(
       context: context,
       firstDate: DateTime.now(),
@@ -73,7 +73,7 @@ class _TripFormWidgetState extends State<TripFormWidget>
       if (selected == null || !context.mounted) return;
       _dateRangeController.text = handleFormatDateRange(selected);
       widget.handleUpdateDateRange(selected);
-      FocusScope.of(context).unfocus();
+      context.unfocus();
     });
   }
 

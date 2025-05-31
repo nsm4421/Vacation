@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:vacation/domain/entities/export.dart';
+import 'package:vacation/presentation/widgets/on_tap_button.dart';
 import 'package:vacation/shared/export.dart';
 
-class EditHistoryModalFragment extends StatefulWidget {
-  const EditHistoryModalFragment({
+class EditHistoryModalScreen extends StatefulWidget {
+  const EditHistoryModalScreen({
     super.key,
     this.initialHistory,
     required this.handleSubmit,
+    required this.dateRange,
   });
 
   final HistoryEntity? initialHistory;
@@ -19,13 +20,14 @@ class EditHistoryModalFragment extends StatefulWidget {
     double? longitude,
   })
   handleSubmit;
+  final DateTimeRange dateRange;
 
   @override
-  State<EditHistoryModalFragment> createState() =>
-      _EditHistoryModalFragmentState();
+  State<EditHistoryModalScreen> createState() =>
+      _EditHistoryModalScreenState();
 }
 
-class _EditHistoryModalFragmentState extends State<EditHistoryModalFragment>
+class _EditHistoryModalScreenState extends State<EditHistoryModalScreen>
     with DateFormatterMixIn, DebounceMixin {
   late final TextEditingController _placeNameController;
   late final TextEditingController _descriptionController;
@@ -54,11 +56,12 @@ class _EditHistoryModalFragmentState extends State<EditHistoryModalFragment>
   }
 
   _handleSelectDate() async {
+    context.unfocus();
     await showDatePicker(
       context: context,
       currentDate: _visitedAt,
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
+      firstDate: widget.dateRange.start,
+      lastDate: widget.dateRange.end,
     ).then((selected) {
       if (selected == null || !context.mounted) return;
       setState(() {
@@ -77,9 +80,6 @@ class _EditHistoryModalFragmentState extends State<EditHistoryModalFragment>
       latitude: null,
       longitude: null,
     );
-    if (context.mounted) {
-      context.pop();
-    }
   });
 
   @override
@@ -95,64 +95,92 @@ class _EditHistoryModalFragmentState extends State<EditHistoryModalFragment>
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8, right: 12),
-                    child: Icon(Icons.location_city_outlined),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      maxLength: 30,
-                      controller: _placeNameController,
-                      decoration: InputDecoration(
-                        hintText: 'Place Name',
-                        border: OutlineInputBorder(),
+                  Row(
+                    children: [
+                      Icon(Icons.location_city_outlined, size: 16),
+                      SizedBox(width: 8),
+                      Text(
+                        'Place Name',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
                       ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    minLines: 1,
+                    maxLines: 1,
+                    maxLength: 30,
+                    controller: _placeNameController,
+                    decoration: InputDecoration(
+                      hintText: 'Where did you go?',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                 ],
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8, right: 12),
-                    child: Icon(Icons.description),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: _descriptionController,
-                      minLines: 3,
-                      maxLines: 10,
-                      maxLength: 1000,
-                      decoration: InputDecoration(
-                        hintText: 'Description',
-                        border: OutlineInputBorder(),
+                  Row(
+                    children: [
+                      Icon(Icons.description, size: 16),
+                      SizedBox(width: 8),
+                      Text(
+                        'Description',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
                       ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    minLines: 3,
+                    maxLines: 10,
+                    maxLength: 1000,
+                    controller: _descriptionController,
+                    decoration: InputDecoration(
+                      hintText: 'How was it?',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                 ],
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8, right: 12),
-                    child: Icon(Icons.date_range_outlined),
+                  Row(
+                    children: [
+                      Icon(Icons.date_range_outlined, size: 16),
+                      SizedBox(width: 8),
+                      Text(
+                        'Visited At',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: TextField(
-                      onTap: _handleSelectDate,
-                      controller: _visitedAtController,
-                      readOnly: true,
-                      decoration: InputDecoration(border: OutlineInputBorder()),
+                  SizedBox(height: 8),
+                  TextField(
+                    onTap: _handleSelectDate,
+                    minLines: 1,
+                    maxLines: 1,
+                    readOnly: true,
+                    controller: _visitedAtController,
+                    decoration: InputDecoration(
+                      hintText: 'How was it?',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                 ],
@@ -161,20 +189,8 @@ class _EditHistoryModalFragmentState extends State<EditHistoryModalFragment>
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        ),
-        onPressed: _handleSubmit,
-        child: Text(
-          "SUBMIT",
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-          ),
-        ),
-      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: OnTapButtonWidget(onTap: _handleSubmit),
     );
   }
 }

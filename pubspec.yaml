@@ -25,6 +25,7 @@ dependencies:
   path_provider: ^2.1.5
   drift: ^2.26.1
   drift_flutter: ^0.2.4
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

@@ -19,19 +19,13 @@ class DisplayTripScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => getIt<DisplayTripsBloc>()..add(DisplayTripsMountedEvent()),
       child: BlocListener<DisplayTripsBloc, DisplayTripsState>(
-        listenWhen:
-            (prev, curr) =>
-                (curr.status == Status.success) ||
-                (curr.status == Status.error),
+        listenWhen: (prev, curr) => curr.status == Status.error,
         listener: (context, state) {
-          // TODO : show toast on success or error
-          Timer.periodic(Duration(seconds: 1), (_) {
-            if (context.mounted) {
-              context.read<DisplayTripsBloc>().add(
-                UpdateDisplayTripsStateEvent(status: Status.initial),
-              );
-            }
-          });
+          context
+            ..showErrorSnackBar(state.message)
+            ..read<DisplayTripsBloc>().add(
+              UpdateDisplayTripsStateEvent(status: Status.initial),
+            );
         },
         child: BlocBuilder<DisplayTripsBloc, DisplayTripsState>(
           builder: (context, state) {

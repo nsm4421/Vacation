@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -38,17 +40,35 @@ class TripItemsFragment extends StatelessWidget with DateFormatterMixIn {
                   extra: trip,
                 ); // 상세 페이지 라우팅
               },
-              title: Text(
-                trip.tripName,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  overflow: TextOverflow.ellipsis,
-                ),
+              leading:
+                  trip.thumbnail == null
+                      ? CircleAvatar(child: Text(trip.tripName[0]))
+                      : CircleAvatar(
+                        backgroundImage: FileImage(File(trip.thumbnail!)),
+                      ),
+              title: Row(
+                children: [
+                  Icon(Icons.title, size: 16),
+                  SizedBox(width: 8),
+                  Text(
+                    trip.tripName,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-              subtitle: Text(
-                '${handleFormatDateTime(trip.startDate)}~${handleFormatDateTime(trip.endDate)}',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  overflow: TextOverflow.ellipsis,
-                ),
+              subtitle: Row(
+                children: [
+                  Icon(Icons.calendar_today, size: 12),
+                  SizedBox(width: 8),
+                  Text(
+                    '${handleFormatDateTime(trip.startDate)}~${handleFormatDateTime(trip.endDate)}',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
               trailing: PopupMenuButton<PopUpMenuEnums>(
                 itemBuilder: (context) {

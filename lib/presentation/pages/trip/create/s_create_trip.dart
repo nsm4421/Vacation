@@ -9,7 +9,6 @@ import 'package:vacation/presentation/widgets/export.dart';
 import 'package:vacation/shared/export.dart';
 
 import 'f_trip_form.dart';
-import 'w_submit_button.dart';
 
 class CreateTripScreen extends StatelessWidget {
   const CreateTripScreen({super.key});
@@ -22,19 +21,19 @@ class CreateTripScreen extends StatelessWidget {
         listener: (context, state) {
           switch (state.status) {
             case Status.success:
-              // TODO : show success message
-              if (context.mounted) {
-                context.pop();
-              }
+              context
+                ..showSuccessSnackBar('success')
+                ..pop();
               return;
             case Status.error:
-              // TODO : show error message
               Timer(Duration(seconds: 1), () {
                 if (context.mounted) {
-                  context.read<CreateTripCubit>().updateStatus(
-                    status: Status.initial,
-                    message: '',
-                  );
+                  context
+                    ..showErrorSnackBar(state.message)
+                    ..read<CreateTripCubit>().updateStatus(
+                      status: Status.initial,
+                      message: '',
+                    );
                 }
               });
               return;
@@ -57,7 +56,13 @@ class CreateTripScreen extends StatelessWidget {
                 ),
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.endFloat,
-                floatingActionButton: SubmitCreateTripFormButton(),
+                floatingActionButton: OnTapButtonWidget(
+                  onTap: () async {
+                    context
+                      ..unfocus()
+                      ..read<CreateTripCubit>().submit();
+                  },
+                ),
               ),
             );
           },
