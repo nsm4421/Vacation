@@ -2,6 +2,7 @@ import 'package:logger/logger.dart';
 import 'package:vacation/data/models/export.dart';
 
 import '../schema/dao/history.dart';
+import '../schema/db/local_db.dart';
 
 part 'history_datasource.dart';
 
@@ -13,45 +14,59 @@ class LocalHistoryDataSourceImpl implements LocalHistoryDataSource {
     : _logger = logger;
 
   @override
-  Future<int> insertHistory({
+  Future<FetchHistoryModel> findHistoryById(int historyId) async {
+    final fetched = await _historyDao.getHistoryById(historyId);
+    if (fetched == null) {
+      _logger?.w('history id $historyId not exist');
+      throw Exception('not found exception');
+    }
+    return _convert(fetched);
+  }
+
+  @override
+  Future<FetchHistoryModel> insertHistory({
     required int tripId,
     required String placeName,
     required String description,
     required DateTime visitedAt,
+    required List<String> images,
     double? latitude,
     double? longitude,
   }) async {
     _logger?.d(
       'tripId:$tripId|placeName:$placeName|visitedAt:$visitedAt|latitude:$latitude|longitude:$longitude',
     );
-    return await _historyDao.insertHistory(
+    final historyId = await _historyDao.insertHistory(
       tripId: tripId,
       placeName: placeName,
       description: description,
       visitedAt: visitedAt,
       latitude: latitude,
       longitude: longitude,
+      images: images,
     );
+    return await findHistoryById(historyId);
   }
 
   @override
-  Future<bool> updateHistory({
+  Future<FetchHistoryModel> updateHistory({
     required int historyId,
-    required String placeName,
-    required String description,
-    required DateTime visitedAt,
+    String? placeName,
+    String? description,
+    DateTime? visitedAt,
+    List<String>? images,
   }) async {
-    final history = await _historyDao.getHistoryById(historyId);
-    if (history == null) {
-      throw Exception('history not found with id $historyId');
-    }
-    return await _historyDao.updateHistory(
-      history.copyWith(
-        placeName: placeName,
-        description: description,
-        visitedAt: visitedAt,
-      ),
+    final updated = await _historyDao.updateHistory(
+      historyId: historyId,
+      placeName: placeName,
+      description: description,
+      visitedAt: visitedAt,
+      images: images,
     );
+    if (!updated) {
+      throw Exception('updating history fails');
+    }
+    return findHistoryById(historyId);
   }
 
   @override
@@ -60,21 +75,24 @@ class LocalHistoryDataSourceImpl implements LocalHistoryDataSource {
   ) async {
     return await _historyDao
         .getHistoriesByTripId(tripId)
-        .then(
-          (res) => res.map(
-            (e) => FetchHistoryModel(
-              id: e.id,
-              tripId: e.tripId,
-              placeName: e.placeName,
-              description: e.description,
-              visitedAt: e.visitedAt,
-            ),
-          ),
-        );
+        .then((res) => res.map(_convert));
   }
 
   @override
   Future<int> deleteHistoryById(int historyId) async {
     return await _historyDao.deleteHistory(historyId);
+  }
+
+  FetchHistoryModel _convert(HistoryTableData data) {
+    return FetchHistoryModel(
+      id: data.id,
+      tripId: data.tripId,
+      placeName: data.placeName,
+      description: data.description,
+      visitedAt: data.visitedAt,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      images: data.imagesJson,
+    );
   }
 }

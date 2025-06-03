@@ -14,7 +14,7 @@ class TripDao extends DatabaseAccessor<LocalDatabase> with _$TripDaoMixin {
     required DateTime startDate,
     required DateTime endDate,
     String? thumbnail,
-  }) => into(tripTable).insert(
+  }) async => await into(tripTable).insert(
     TripTableCompanion(
       tripName: Value(tripName),
       startDate: Value(startDate),
@@ -24,10 +24,12 @@ class TripDao extends DatabaseAccessor<LocalDatabase> with _$TripDaoMixin {
   );
 
   // Read
-  Future<List<TripTableData>> getAllTrips() => select(tripTable).get();
+  Future<List<TripTableData>> getAllTrips() async =>
+      await select(tripTable).get();
 
-  Future<TripTableData?> getTripById(int id) =>
-      (select(tripTable)..where((t) => t.id.equals(id))).getSingleOrNull();
+  Future<TripTableData?> getTripById(int id) async =>
+      await (select(tripTable)
+        ..where((t) => t.id.equals(id))).getSingleOrNull();
 
   // Update
   Future<bool> updateTrip({
@@ -36,7 +38,7 @@ class TripDao extends DatabaseAccessor<LocalDatabase> with _$TripDaoMixin {
     required DateTime startDate,
     required DateTime endDate,
     String? thumbnail,
-  }) => update(tripTable).replace(
+  }) async => await update(tripTable).replace(
     TripTableCompanion(
       id: Value(id),
       tripName: Value(tripName),
@@ -47,6 +49,6 @@ class TripDao extends DatabaseAccessor<LocalDatabase> with _$TripDaoMixin {
   );
 
   // Delete
-  Future<int> deleteTrip(int id) =>
-      (delete(tripTable)..where((t) => t.id.equals(id))).go();
+  Future<int> deleteTrip(int id) async =>
+      await (delete(tripTable)..where((t) => t.id.equals(id))).go();
 }

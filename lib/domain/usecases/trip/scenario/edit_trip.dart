@@ -72,13 +72,13 @@ class EditTripUseCase {
         _thumbnail = null;
       } else if (originalThumbnail == null && thumbnailFile != null) {
         _logger?.t('thumbnail added');
-        _thumbnail = await _repository.saveThumbnail(File(thumbnailFile.path));
+        _thumbnail = await _repository.saveImage(File(thumbnailFile.path));
       } else if (originalThumbnail != null && thumbnailFile == null) {
         _logger?.t('thumbnail deleted');
-        await _repository.deleteThumbnail(originalThumbnail);
+        await _repository.deleteImage(originalThumbnail);
       } else if (originalThumbnail != null && thumbnailFile != null) {
         _logger?.t('thumbnail replaced');
-        _thumbnail = await _repository.changeThumbnail(
+        _thumbnail = await _repository.changeImage(
           file: File(thumbnailFile.path),
           originalPath: originalThumbnail,
         );

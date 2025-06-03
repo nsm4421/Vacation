@@ -57,8 +57,8 @@ class CreateTripUseCase {
   Future<Result<void>> _handleImage(XFile? thumbnailFile) async {
     try {
       if (thumbnailFile != null) {
-        final file = File(thumbnailFile!.path);
-        _thumbnail = await _repository.saveThumbnail(file);
+        final file = File(thumbnailFile.path);
+        _thumbnail = await _repository.saveImage(file);
       }
     } catch (error) {
       return Left(Failure(message: 'saving image fails'));

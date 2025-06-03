@@ -1,22 +1,21 @@
-import 'dart:io';
-
 import 'package:injectable/injectable.dart';
 import 'package:vacation/data/datasources/export.dart';
 import 'package:vacation/domain/entities/export.dart';
 import 'package:vacation/domain/repositories/export.dart';
 
+import '../image/image_repository_impl.dart';
+
 @LazySingleton(as: TripRepository)
-class TripRepositoryImpl implements TripRepository {
+class TripRepositoryImpl extends $ImageRepositoryImpl
+    implements TripRepository {
   final LocalTripDataSource _localDataSource;
-  final LocalStorage _localStorage;
 
   TripRepositoryImpl({
     required LocalTripDataSource localDataSource,
     required LocalStorage localStorage,
   }) : _localDataSource = localDataSource,
-       _localStorage = localStorage;
+       super(localStorage);
 
-  /// database
   @override
   Future<int> createTrip({
     required String tripName,
@@ -59,24 +58,5 @@ class TripRepositoryImpl implements TripRepository {
   @override
   Future<int> deleteTripById(int id) async {
     return await _localDataSource.deleteTripById(id);
-  }
-
-  /// local storage
-  @override
-  Future<String> changeThumbnail({
-    required File file,
-    required String originalPath,
-  }) async {
-    return await _localStorage.saveFileAndReturnPath(file: file, upsert: true);
-  }
-
-  @override
-  Future<void> deleteThumbnail(String path) async {
-    return await _localStorage.deleteFile(path);
-  }
-
-  @override
-  Future<String> saveThumbnail(File file) async {
-    return await _localStorage.saveFileAndReturnPath(file: file, upsert: false);
   }
 }

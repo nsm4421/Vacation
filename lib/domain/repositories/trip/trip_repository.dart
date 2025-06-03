@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:vacation/domain/entities/export.dart';
 
-abstract interface class TripRepository {
-  /// database
+import '../image/image_repository.dart';
+
+abstract interface class TripRepository implements ImageRepository {
   Future<int> createTrip({
     required String tripName,
     required DateTime startDate,
@@ -22,14 +21,4 @@ abstract interface class TripRepository {
   });
 
   Future<int> deleteTripById(int id);
-
-  /// storage
-  Future<String> saveThumbnail(File file);
-
-  Future<String> changeThumbnail({
-    required File file,
-    required String originalPath,
-  });
-
-  Future<void> deleteThumbnail(String path);
 }

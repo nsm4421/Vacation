@@ -20,7 +20,7 @@ class HistoryUseCase {
       FetchAllHistoriesByTripIdUseCase(_repository);
 
   @lazySingleton
-  EditHistoryUseCase get editHistory => EditHistoryUseCase(_repository);
+  EditHistoryDataUseCase get editHistory => EditHistoryDataUseCase(_repository);
 
   @lazySingleton
   DeleteHistoryUseCase get deleteHistory => DeleteHistoryUseCase(_repository);

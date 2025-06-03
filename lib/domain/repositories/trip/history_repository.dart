@@ -1,20 +1,23 @@
 import 'package:vacation/domain/entities/export.dart';
+import '../image/image_repository.dart';
 
-abstract interface class HistoryRepository {
-  Future<int> createHistory({
+abstract interface class HistoryRepository implements ImageRepository {
+  Future<HistoryEntity> createHistory({
     required int tripId,
     required String placeName,
     required String description,
+    required List<String> images,
     required DateTime visitedAt,
     double? latitude,
     double? longitude,
   });
 
-  Future<bool> updateHistory({
+  Future<HistoryEntity> updateHistory({
     required int historyId,
-    required String placeName,
-    required String description,
-    required DateTime visitedAt,
+    String? placeName,
+    String? description,
+    DateTime? visitedAt,
+    List<String>? images,
   });
 
   Future<List<HistoryEntity>> fetchAllHistoriesByTripId(int tripId);

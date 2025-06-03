@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:vacation/data/datasources/export.dart';
 
 part 'fetch_history.freezed.dart';
 
@@ -13,6 +14,7 @@ class FetchHistoryModel with _$FetchHistoryModel {
     required this.placeName,
     required this.description,
     required this.visitedAt,
+    required this.images,
     this.latitude,
     this.longitude,
   });
@@ -22,6 +24,7 @@ class FetchHistoryModel with _$FetchHistoryModel {
   final String placeName;
   final String description;
   final DateTime visitedAt;
+  final List<String> images;
   final double? latitude;
   final double? longitude;
 
