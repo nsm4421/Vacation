@@ -3,9 +3,10 @@ import 'package:injectable/injectable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vacation/domain/entities/export.dart';
 import 'package:vacation/presentation/pages/export.dart';
-import 'package:vacation/presentation/pages/trip/detail/s_trip_detail.dart';
-import 'package:vacation/presentation/pages/trip/edit/s_edit_trip.dart';
 import 'package:vacation/shared/export.dart';
+
+import '../trip/detail/s_trip_detail.dart';
+import '../trip/edit/s_edit_trip.dart';
 
 part 'route_paths.dart';
 
@@ -19,16 +20,9 @@ class CustomRouter with LoggerMixIn {
 
   @lazySingleton
   GoRouter get routerConfig => GoRouter(
-    initialLocation: RoutePaths.entry.path,
+    initialLocation: RoutePaths.displayTrips.path,
     navigatorKey: _rootNavigatorKey,
-    routes: [_indexRoute, ..._tripRoutes],
-  );
-
-  @lazySingleton
-  GoRoute get _indexRoute => GoRoute(
-    // 시작 페이지
-    path: RoutePaths.entry.path,
-    builder: (_, __) => const IndexScreen(),
+    routes: _tripRoutes.toList(),
   );
 
   @lazySingleton
