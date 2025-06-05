@@ -84,7 +84,7 @@ class EditTripBloc extends Bloc<EditTripEvent, EditTripState> with LoggerMixIn {
                   state.copyWith(
                     status: Status.success,
                     data: state.data.copyWith(
-                      trip: temp.copyWith(thumbnail: r),  // 썸네일 파일 경로 업데이트
+                      trip: temp.copyWith(thumbnail: r), // 썸네일 파일 경로 업데이트
                     ),
                   ),
                 );
@@ -104,19 +104,13 @@ class EditTripBloc extends Bloc<EditTripEvent, EditTripState> with LoggerMixIn {
     Emitter<EditTripState> emit,
   ) async {
     try {
-      var temp =
-          state.data.histories.where((e) => e.id == event.historyId).first;
-      temp = temp.copyWith(
-        placeName: event.placeName ?? temp.placeName,
-        description: event.description ?? temp.description,
-        visitedAt: event.visitedAt ?? temp.visitedAt,
-      );
       await _historyUseCase
           .editHistory(
             historyId: event.historyId,
-            placeName: temp.placeName,
-            description: temp.description,
-            visitedAt: temp.visitedAt,
+            placeName: event.placeName,
+            description: event.description,
+            visitedAt: event.visitedAt,
+            images: event.images,
           )
           .then(
             (res) => res.fold(
@@ -128,14 +122,19 @@ class EditTripBloc extends Bloc<EditTripEvent, EditTripState> with LoggerMixIn {
                   ),
                 );
               },
-              (_) {
+              (r) {
+                if (r == null) {
+                  logger.w('updated result not given');
+                }
                 emit(
                   state.copyWith(
                     status: Status.success,
                     data: state.data.copyWith(
                       histories:
                           state.data.histories
-                              .map((e) => e.id == event.historyId ? temp : e)
+                              .map(
+                                (e) => e.id == event.historyId ? (r ?? e) : e,
+                              )
                               .toList(),
                     ),
                   ),
@@ -164,6 +163,7 @@ class EditTripBloc extends Bloc<EditTripEvent, EditTripState> with LoggerMixIn {
             visitedAt: event.visitedAt,
             latitude: event.latitude,
             longitude: event.longitude,
+            images: event.images,
           )
           .then(
             (res) => res.fold(
@@ -176,22 +176,19 @@ class EditTripBloc extends Bloc<EditTripEvent, EditTripState> with LoggerMixIn {
                 );
               },
               (r) {
-                logger.t('history inserted');
+                if (r == null) {
+                  logger.w('created history not returned');
+                } else {
+                  logger.t('history inserted');
+                }
                 emit(
                   state.copyWith(
                     status: Status.success,
                     data: state.data.copyWith(
-                      histories: [
-                        ...state.data.histories,
-                        HistoryEntity(
-                          id: r,
-                          placeName: event.placeName,
-                          description: event.description,
-                          visitedAt: event.visitedAt,
-                          latitude: event.latitude,
-                          longitude: event.longitude,
-                        ),
-                      ],
+                      histories:
+                          r == null
+                              ? state.data.histories
+                              : [...state.data.histories, r],
                     ),
                   ),
                 );

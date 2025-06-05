@@ -24,10 +24,10 @@ class LocalDatabase extends _$LocalDatabase {
           final file = File(p.join(dbFolder.path, Env.dbName));
 
           // dev인경우만
-          if (await file.exists()) {
-            await file.delete();
-            print('✅ DB 파일 삭제됨');
-          }
+          // if (await file.exists()) {
+          //   await file.delete();
+          //   print('✅ DB 파일 삭제됨');
+          // }
 
           return NativeDatabase(file);
         }),

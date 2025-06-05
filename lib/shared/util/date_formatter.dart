@@ -15,4 +15,8 @@ mixin class DateFormatterMixIn {
   String handleFormatDateTime(DateTime dt) {
     return "${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}";
   }
+
+  DateTime handleFormatStringToDateTime(String text) {
+    return DateTime.parse(text);
+  }
 }

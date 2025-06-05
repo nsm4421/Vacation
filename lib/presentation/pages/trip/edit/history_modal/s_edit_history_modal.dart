@@ -1,14 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:vacation/domain/entities/export.dart';
 import 'package:vacation/presentation/widgets/on_tap_button.dart';
 import 'package:vacation/shared/export.dart';
+
+import 'w_description.dart';
+import 'w_photos.dart';
+import 'w_place_name.dart';
+import 'w_visited_at.dart';
 
 class EditHistoryModalScreen extends StatefulWidget {
   const EditHistoryModalScreen({
     super.key,
     this.initialHistory,
     required this.handleSubmit,
-    required this.dateRange,
+    required this.dateRange, // trip date range
+    required this.statusStream,
   });
 
   final HistoryEntity? initialHistory;
@@ -16,15 +26,16 @@ class EditHistoryModalScreen extends StatefulWidget {
     required String placeName,
     required String description,
     required DateTime visitedAt,
+    required List<XFile> images,
     double? latitude,
     double? longitude,
   })
   handleSubmit;
   final DateTimeRange dateRange;
+  final Stream<bool> statusStream;
 
   @override
-  State<EditHistoryModalScreen> createState() =>
-      _EditHistoryModalScreenState();
+  State<EditHistoryModalScreen> createState() => _EditHistoryModalScreenState();
 }
 
 class _EditHistoryModalScreenState extends State<EditHistoryModalScreen>
@@ -32,7 +43,8 @@ class _EditHistoryModalScreenState extends State<EditHistoryModalScreen>
   late final TextEditingController _placeNameController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _visitedAtController;
-  late DateTime _visitedAt;
+  late List<XFile> _images;
+  late StreamSubscription<bool> _subscription;
 
   @override
   void initState() {
@@ -42,9 +54,18 @@ class _EditHistoryModalScreenState extends State<EditHistoryModalScreen>
     _descriptionController =
         TextEditingController()
           ..text = widget.initialHistory?.description ?? '';
-    _visitedAt = widget.initialHistory?.visitedAt ?? DateTime.now();
     _visitedAtController =
-        TextEditingController()..text = handleFormatDateTime(_visitedAt);
+        TextEditingController()
+          ..text = handleFormatDateTime(
+            widget.initialHistory?.visitedAt ?? DateTime.now(),
+          );
+    _images = widget.initialHistory?.images.map((e) => XFile(e)).toList() ?? [];
+    _subscription = widget.statusStream.listen((v) {
+      // 히스토리 수정 이벤트가 성공하는 경우, 모달창 닫기를 실행하기 위해 status필드를 위한 stream
+      if (v && context.canPop()) {
+        context.pop();
+      }
+    });
   }
 
   @override
@@ -53,21 +74,12 @@ class _EditHistoryModalScreenState extends State<EditHistoryModalScreen>
     _placeNameController.dispose();
     _descriptionController.dispose();
     _visitedAtController.dispose();
+    _subscription.cancel();
   }
 
-  _handleSelectDate() async {
-    context.unfocus();
-    await showDatePicker(
-      context: context,
-      currentDate: _visitedAt,
-      firstDate: widget.dateRange.start,
-      lastDate: widget.dateRange.end,
-    ).then((selected) {
-      if (selected == null || !context.mounted) return;
-      setState(() {
-        _visitedAt = selected;
-        _visitedAtController.text = handleFormatDateTime(_visitedAt);
-      });
+  void _setImages(List<XFile> images) {
+    setState(() {
+      _images = images;
     });
   }
 
@@ -75,7 +87,8 @@ class _EditHistoryModalScreenState extends State<EditHistoryModalScreen>
     widget.handleSubmit(
       placeName: _placeNameController.text.trim(),
       description: _descriptionController.text.trim(),
-      visitedAt: _visitedAt,
+      visitedAt: handleFormatStringToDateTime(_visitedAtController.text.trim()),
+      images: _images,
       // TODO : 위치정보 가져오기 기능 구현
       latitude: null,
       longitude: null,
@@ -95,96 +108,27 @@ class _EditHistoryModalScreenState extends State<EditHistoryModalScreen>
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.location_city_outlined, size: 16),
-                      SizedBox(width: 8),
-                      Text(
-                        'Place Name',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  TextField(
-                    minLines: 1,
-                    maxLines: 1,
-                    maxLength: 30,
-                    controller: _placeNameController,
-                    decoration: InputDecoration(
-                      hintText: 'Where did you go?',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
+              child: PlaceNameWidget(_placeNameController),
             ),
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.description, size: 16),
-                      SizedBox(width: 8),
-                      Text(
-                        'Description',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  TextField(
-                    minLines: 3,
-                    maxLines: 10,
-                    maxLength: 1000,
-                    controller: _descriptionController,
-                    decoration: InputDecoration(
-                      hintText: 'How was it?',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
-              ),
+              child: DescriptionWidget(_descriptionController),
             ),
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.date_range_outlined, size: 16),
-                      SizedBox(width: 8),
-                      Text(
-                        'Visited At',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  TextField(
-                    onTap: _handleSelectDate,
-                    minLines: 1,
-                    maxLines: 1,
-                    readOnly: true,
-                    controller: _visitedAtController,
-                    decoration: InputDecoration(
-                      hintText: 'How was it?',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ],
+              child: VisitedAtWidget(
+                controller: _visitedAtController,
+                firstDate: widget.dateRange.start,
+                lastDate: widget.dateRange.end,
               ),
+            ),
+
+            // 사진
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: PhotosWidget(images: _images, setImages: _setImages),
             ),
           ],
         ),

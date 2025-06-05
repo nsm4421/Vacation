@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:vacation/domain/entities/export.dart';
 import 'package:vacation/presentation/providers/export.dart';
 import 'package:vacation/shared/export.dart';
@@ -47,6 +47,7 @@ class _HistoriesFragmentState extends State<HistoriesFragment>
     required String placeName,
     required String description,
     required DateTime visitedAt,
+    required List<XFile> images,
     double? latitude,
     double? longitude,
   }) {
@@ -54,6 +55,7 @@ class _HistoriesFragmentState extends State<HistoriesFragment>
       InsertHistoryDataEvent(
         placeName: placeName,
         description: description,
+        images: images,
         visitedAt: visitedAt,
         latitude: latitude,
         longitude: longitude,
@@ -67,22 +69,10 @@ class _HistoriesFragmentState extends State<HistoriesFragment>
       showDragHandle: true,
       isScrollControlled: true,
       builder:
-          (childContext) => StreamBuilder<bool>(
-            stream: _stream,
-            builder: (_, snapshot) {
-              if (snapshot.data == true && childContext.mounted) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (childContext.canPop()) {
-                    childContext.pop();
-                  }
-                });
-              }
-              return EditHistoryModalScreen(
-                handleSubmit: _handleInsertHistory,
-                dateRange:
-                    context.read<EditTripBloc>().state.data.trip.dateRange,
-              );
-            },
+          (_) => EditHistoryModalScreen(
+            handleSubmit: _handleInsertHistory,
+            dateRange: context.read<EditTripBloc>().state.data.trip.dateRange,
+            statusStream: _stream,
           ),
     );
   }
@@ -91,6 +81,7 @@ class _HistoriesFragmentState extends State<HistoriesFragment>
     required String placeName,
     required String description,
     required DateTime visitedAt,
+    required List<XFile> images,
     double? latitude,
     double? longitude,
   }) {
@@ -100,6 +91,7 @@ class _HistoriesFragmentState extends State<HistoriesFragment>
         placeName: placeName,
         description: description,
         visitedAt: visitedAt,
+        images: images,
       ),
     );
   };
@@ -110,17 +102,11 @@ class _HistoriesFragmentState extends State<HistoriesFragment>
       showDragHandle: true,
       isScrollControlled: true,
       builder:
-          (childContext) => StreamBuilder<bool>(
-            stream: _stream,
-            builder: (_, snapshot) {
-              if (snapshot.data == true) childContext.pop();
-              return EditHistoryModalScreen(
-                initialHistory: e,
-                handleSubmit: _handleUpdateHistory(e),
-                dateRange:
-                    context.read<EditTripBloc>().state.data.trip.dateRange,
-              );
-            },
+          (_) => EditHistoryModalScreen(
+            initialHistory: e,
+            handleSubmit: _handleUpdateHistory(e),
+            dateRange: context.read<EditTripBloc>().state.data.trip.dateRange,
+            statusStream: _stream,
           ),
     );
   };

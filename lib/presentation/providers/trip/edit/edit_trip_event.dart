@@ -24,12 +24,14 @@ class UpdateHistoryDataEvent extends EditTripEvent {
   final String? placeName;
   final String? description;
   final DateTime? visitedAt;
+  final List<XFile>? images;
 
   UpdateHistoryDataEvent({
     required this.historyId,
     this.placeName,
     this.description,
     this.visitedAt,
+    this.images,
   });
 }
 
@@ -39,6 +41,7 @@ class InsertHistoryDataEvent extends EditTripEvent {
   final DateTime visitedAt;
   final double? latitude;
   final double? longitude;
+  final List<XFile> images;
 
   InsertHistoryDataEvent({
     required this.placeName,
@@ -46,6 +49,7 @@ class InsertHistoryDataEvent extends EditTripEvent {
     required this.visitedAt,
     required this.latitude,
     required this.longitude,
+    required this.images,
   });
 }
 
