@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vacation/domain/entities/export.dart';
-import 'package:vacation/presentation/pages/export.dart';
+import 'package:vacation/presentation/pages/youtube/detail/s_video_detail.dart';
 import 'package:vacation/shared/export.dart';
 
+import '../trip/create/s_create_trip.dart';
 import '../trip/detail/s_trip_detail.dart';
+import '../trip/display/s_display_trip.dart';
 import '../trip/edit/s_edit_trip.dart';
+import '../youtube/search/s_search_videos.dart';
 
 part 'route_paths.dart';
 
@@ -20,9 +23,10 @@ class CustomRouter with LoggerMixIn {
 
   @lazySingleton
   GoRouter get routerConfig => GoRouter(
-    initialLocation: RoutePaths.displayTrips.path,
+    initialLocation: RoutePaths.searchYoutube.path,
+    // 일단 이렇게 해놓고 나중에 Index페이지 만들기
     navigatorKey: _rootNavigatorKey,
-    routes: _tripRoutes.toList(),
+    routes: [..._tripRoutes, ..._youtubeRoutes],
   );
 
   @lazySingleton
@@ -57,6 +61,20 @@ class CustomRouter with LoggerMixIn {
           logger.e(error);
           return Text('PAGE NOT FOUND');
         }
+      },
+    ),
+  ];
+
+  @lazySingleton
+  Iterable<GoRoute> get _youtubeRoutes => [
+    GoRoute(
+      path: RoutePaths.searchYoutube.path,
+      builder: (_, __) => const SearchVideosScreen(),
+    ),
+    GoRoute(
+      path: RoutePaths.youtubeDetail.path,
+      builder: (_, state) {
+        return VideoDetailScreen(state.extra as VideoEntity);
       },
     ),
   ];
