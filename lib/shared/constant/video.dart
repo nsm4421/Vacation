@@ -1,0 +1,3 @@
+enum VideoType {
+  video, audio;
+}

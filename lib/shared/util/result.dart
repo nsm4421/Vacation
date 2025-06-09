@@ -1,6 +1,8 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:either_dart/either.dart';
 
+part 'result.g.dart';
+
 enum ErrorCode {
   noDescription(code: '500', message: 'unKnown');
 

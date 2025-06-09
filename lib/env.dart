@@ -7,4 +7,6 @@ part 'env.g.dart';
 abstract class Env {
   @EnviedField(varName: 'DB_NAME')
   static const String dbName = _Env.dbName;
+  @EnviedField(varName: 'YOUTUBE_API_KEY')
+  static const String youtubeApiKey = _Env.youtubeApiKey;
 }
